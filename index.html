@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận vượt link - Hệ thống kiếm tiền</title>
+    <!-- Tích hợp Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #102a43;
+            --text-muted: #486581;
+            --danger: #e11d48;
+            --success: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            padding: 40px 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--text-main);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Hướng dẫn Step-by-step */
+        .instruction-box {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .step-content {
+            color: var(--text-main);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .step-content b {
+            color: var(--primary);
+        }
+
+        .keyword-box {
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+            border: 1px solid #c7d2fe;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .keyword-box:hover {
+            background: #c7d2fe;
+        }
+
+        /* Form nhập mã */
+        .action-area {
+            position: relative;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Trạng thái thông báo */
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 20px;
+            transition: color 0.3s;
+        }
+
+        .error { color: var(--danger); }
+        .success { color: var(--success); }
+
+        /* Spinner loading */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .card { padding: 30px 20px; }
+            .header h1 { font-size: 20px; }
+            input, button { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Mở khóa Liên Kết</h1>
+                <p>Hoàn thành nhiệm vụ nhỏ dưới đây để ủng hộ tác giả</p>
+            </div>
+
+            <div class="instruction-box">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        Mở thẻ mới và truy cập công cụ tìm kiếm <b>Google.com</b>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        Tìm kiếm từ khóa dưới đây (nhấn để copy):
+                        <br>
+                        <div class="keyword-box" onclick="copyKeyword()">
+                            <i class="fa-regular fa-copy"></i> Dịch vụ SEO web uy tín
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        Tìm trang web <b>domaincuaban.com</b> (thường nằm ở trang 1 hoặc 2) và truy cập vào.
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        Cuộn xuống cuối trang web đó, đợi <b>60 giây</b> để nhận mã xác nhận và dán vào ô bên dưới.
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-area">
+                <div class="input-group">
+                    <input type="text" id="codeInput" placeholder="Nhập mã xác nhận tại đây..." autocomplete="off" maxlength="10">
+                    <button id="submitBtn" onclick="verifyCode()">
+                        <span class="btn-text">Tiếp tục đến link gốc</span>
+                        <div class="spinner" id="spinner"></div>
+                        <i class="fa-solid fa-arrow-right btn-icon"></i>
+                    </button>
+                </div>
+                <p id="message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Copy từ khóa nhanh
+        function copyKeyword() {
+            const keyword = "Dịch vụ SEO web uy tín";
+            navigator.clipboard.writeText(keyword).then(() => {
+                const msgBox = document.getElementById('message');
+                msgBox.textContent = "Đã copy từ khóa thành công!";
+                msgBox.className = "success";
+                setTimeout(() => { msgBox.textContent = ""; }, 3000);
+            });
+        }
+
+        // Mô phỏng logic kiểm tra mã code
+        function verifyCode() {
+            const codeInput = document.getElementById('codeInput').value.trim();
+            const messageEl = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.querySelector('.btn-text');
+            const btnIcon = document.querySelector('.btn-icon');
+            const spinner = document.getElementById('spinner');
+
+            if (!codeInput) {
+                messageEl.textContent = "Vui lòng nhập mã xác nhận!";
+                messageEl.className = "error";
+                return;
+            }
+
+            // Đổi trạng thái button sang Loading
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnIcon.style.display = 'none';
+            spinner.style.display = 'block';
+            messageEl.textContent = "Đang kiểm tra mã...";
+            messageEl.className = "";
+
+            // Giả lập thời gian kết nối server (1.5 giây)
+            setTimeout(() => {
+                // ĐÂY LÀ LOGIC FRONTEND GIẢ LẬP:
+                // Trong thực tế, mã này phải được gửi qua API đến Backend để kiểm tra.
+                // Ở đây ta giả định mã đúng là "889900"
+                if (codeInput === "889900") {
+                    messageEl.textContent = "Mã chính xác! Đang chuyển hướng...";
+                    messageEl.className = "success";
+                    
+                    // Chuyển hướng tới link đích sau 1 giây
+                    setTimeout(() => {
+                        window.location.href = "https://github.com"; 
+                    }, 1000);
+                } else {
+                    messageEl.textContent = "Mã xác nhận không hợp lệ hoặc đã hết hạn!";
+                    messageEl.className = "error";
+                    
+                    // Khôi phục trạng thái button
+                    submitBtn.disabled = false;
+                    btnText.style.display = 'block';
+                    btnIcon.style.display = 'block';
+                    spinner.style.display = 'none';
+                }
+            }, 1500);
+        }
+
+        // Cho phép nhấn Enter để xác nhận
+        document.getElementById('codeInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                verifyCode();
+            }
+        });
+    </script>
+</body>
+</html>
